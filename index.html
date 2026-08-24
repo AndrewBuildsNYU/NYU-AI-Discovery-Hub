@@ -1,0 +1,1252 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+  <title>NYU AI Discovery Hub — Goal-Based AI Decision Support for Higher Education</title>
+  <style>
+    :root {
+      --nyu-violet: #57068c;
+      --nyu-violet-dark: #330662;
+      --nyu-violet-light: #f3e8ff;
+      --nyu-violet-muted: #e9d5ff;
+      --bg-main: #f8fafc;
+      --card-bg: #ffffff;
+      --card-border: #e2e8f0;
+      --text-main: #0f172a;
+      --text-muted: #64748b;
+      --accent-green: #059669;
+      --accent-amber: #d97706;
+      --accent-blue: #2563eb;
+      --accent-red: #dc2626;
+      --shadow-sm: 0 1px 3px rgba(0,0,0,0.05), 0 1px 2px rgba(0,0,0,0.03);
+      --shadow-md: 0 4px 6px -1px rgba(0,0,0,0.06), 0 2px 4px -1px rgba(0,0,0,0.03);
+      --shadow-lg: 0 10px 25px -3px rgba(0,0,0,0.08), 0 4px 6px -2px rgba(0,0,0,0.03);
+    }
+
+    * { box-sizing: border-box; }
+    body, html {
+      margin: 0; padding: 0; width: 100%; height: 100%;
+      background-color: var(--bg-main); color: var(--text-main);
+      font-family: Inter, ui-sans-serif, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+      font-size: 15px; line-height: 1.55; letter-spacing: -0.005em;
+      overflow-x: hidden;
+    }
+
+    /* SVG Icons */
+    .icon { width: 18px; height: 18px; flex: 0 0 auto; stroke: currentColor; fill: none; stroke-width: 1.8; stroke-linecap: round; stroke-linejoin: round; }
+    .icon-sm { width: 14px; height: 14px; }
+    .icon-lg { width: 28px; height: 28px; }
+    .section-icon { width: 42px; height: 42px; display: grid; place-items: center; color: var(--nyu-violet); background: var(--nyu-violet-light); border: 1px solid var(--nyu-violet-muted); border-radius: 10px; }
+
+    /* Top Navigation Header */
+    header {
+      background: #ffffff; border-bottom: 1px solid var(--card-border);
+      padding: 0 clamp(16px, 4vw, 36px); display: flex; justify-content: space-between;
+      align-items: center; min-height: 64px; position: sticky; top: 0; z-index: 1000;
+      box-shadow: var(--shadow-sm);
+    }
+    .brand { font-size: 1.12rem; font-weight: 800; color: var(--nyu-violet-dark); display: flex; align-items: center; gap: 10px; letter-spacing: -0.02em; }
+    .brand-mark { width: 34px; height: 34px; display: grid; place-items: center; color: white; background: var(--nyu-violet); border-radius: 8px; }
+
+    /* Header Nav Tabs */
+    .nav-links { display: flex; gap: 6px; overflow-x: auto; }
+    .nav-tab {
+      background: transparent; border: none; border-bottom: 2px solid transparent; padding: 18px 12px; font-weight: 600;
+      font-size: 0.88rem; color: var(--text-muted); cursor: pointer; display: inline-flex; align-items: center; gap: 7px; white-space: nowrap;
+      transition: color 0.15s ease, border-color 0.15s ease;
+    }
+    .nav-tab:hover { color: var(--nyu-violet); }
+    .nav-tab.active { color: var(--nyu-violet); border-bottom-color: var(--nyu-violet); font-weight: 750; }
+
+    /* Main Container */
+    main {
+      max-width: 1080px; margin: 0 auto; padding: 32px 20px 64px;
+      display: flex; flex-direction: column; gap: 24px;
+    }
+
+    /* Cards */
+    .card {
+      background: var(--card-bg); border: 1px solid var(--card-border);
+      border-radius: 12px; padding: 24px; box-shadow: var(--shadow-sm);
+      display: flex; flex-direction: column; gap: 16px;
+    }
+    .card-title { font-size: 1.15rem; font-weight: 800; color: var(--text-main); letter-spacing: -0.015em; display: flex; align-items: center; gap: 10px; }
+
+    /* Buttons */
+    button.btn-primary {
+      background: var(--nyu-violet); color: #ffffff; font-weight: 650;
+      border: 1px solid var(--nyu-violet); border-radius: 8px; padding: 11px 18px; font-size: 0.92rem;
+      min-height: 44px; cursor: pointer; display: inline-flex; align-items: center;
+      justify-content: center; gap: 8px; transition: background 0.15s ease, box-shadow 0.15s ease;
+    }
+    button.btn-primary:hover { background: var(--nyu-violet-dark); box-shadow: 0 4px 12px rgba(87, 6, 140, 0.2); }
+
+    button.btn-secondary {
+      background: #ffffff; color: var(--text-main); border: 1px solid var(--card-border);
+      border-radius: 8px; padding: 10px 16px; font-size: 0.88rem; font-weight: 600;
+      min-height: 42px; cursor: pointer; display: inline-flex; align-items: center;
+      justify-content: center; gap: 7px; transition: background 0.15s ease, border-color 0.15s ease;
+    }
+    button.btn-secondary:hover { background: #f1f5f9; border-color: #cbd5e1; }
+
+    input, select, textarea {
+      width: 100%; padding: 11px 14px; background: #ffffff;
+      border: 1px solid var(--card-border); color: var(--text-main);
+      border-radius: 8px; font-size: 14.5px; outline: none; min-height: 42px;
+    }
+    input:focus, select:focus, textarea:focus {
+      border-color: var(--nyu-violet); box-shadow: 0 0 0 3px rgba(87, 6, 140, 0.12);
+    }
+
+    /* Badges */
+    .badge {
+      padding: 3px 9px; border-radius: 4px; font-size: 0.72rem; font-weight: 700; letter-spacing: 0.04em;
+      display: inline-flex; align-items: center; gap: 5px; text-transform: uppercase;
+    }
+    .badge-nyu { background: var(--nyu-violet-light); color: var(--nyu-violet-dark); border: 1px solid var(--nyu-violet-muted); }
+    .badge-success { background: #d1fae5; color: #065f46; border: 1px solid #a7f3d0; }
+    .badge-amber { background: #fef3c7; color: #92400e; border: 1px solid #fde68a; }
+    .badge-blue { background: #dbeafe; color: #1e40af; border: 1px solid #bfdbfe; }
+    .badge-neutral { background: #f1f5f9; color: #475569; border: 1px solid #e2e8f0; }
+
+    /* Selection Visual Cards */
+    .selection-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap: 14px; }
+    .select-card {
+      background: #ffffff; border: 1px solid var(--card-border); border-radius: 10px;
+      padding: 16px; cursor: pointer; transition: all 0.15s ease; display: flex; flex-direction: column; gap: 8px;
+    }
+    .select-card:hover { border-color: var(--nyu-violet); background: #faf5ff; transform: translateY(-2px); box-shadow: var(--shadow-md); }
+    .select-card.selected { border-color: var(--nyu-violet); background: var(--nyu-violet-light); box-shadow: 0 0 0 2px var(--nyu-violet); }
+    .select-card-title { font-weight: 750; font-size: 0.96rem; color: var(--text-main); }
+    .select-card-desc { font-size: 0.82rem; color: var(--text-muted); line-height: 1.4; }
+
+    /* Matrix Table */
+    .table-container { width: 100%; overflow-x: auto; border: 1px solid var(--card-border); border-radius: 8px; }
+    table.matrix { width: 100%; border-collapse: collapse; font-size: 0.88rem; text-align: left; }
+    table.matrix th, table.matrix td { padding: 12px 16px; border-bottom: 1px solid var(--card-border); vertical-align: middle; }
+    table.matrix th { background: #f8fafc; font-weight: 750; color: var(--text-muted); }
+    table.matrix tr:last-child td { border-bottom: none; }
+    table.matrix tr:hover td { background: #faf5ff; }
+
+    /* Comparison Status Tags */
+    .rating-tag { font-weight: 700; font-size: 0.76rem; padding: 3px 8px; border-radius: 4px; display: inline-block; }
+    .rating-excellent { background: #d1fae5; color: #065f46; }
+    .rating-supported { background: #dbeafe; color: #1e40af; }
+    .rating-limited { background: #fef3c7; color: #92400e; }
+    .rating-none { background: #f1f5f9; color: #64748b; }
+
+    /* Screen Views */
+    .view-panel { display: none; flex-direction: column; gap: 20px; }
+    .view-panel.active { display: flex; }
+
+    @media (max-width: 768px) {
+      .selection-grid { grid-template-columns: 1fr; }
+      .nav-links { padding-bottom: 4px; }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- SVG Symbol Sprite -->
+  <svg aria-hidden="true" style="position:absolute;width:0;height:0;overflow:hidden">
+    <defs>
+      <symbol id="i-compass" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><polygon points="16.24 7.76 14.12 14.12 7.76 16.24 9.88 9.88 16.24 7.76"/></symbol>
+      <symbol id="i-search" viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></symbol>
+      <symbol id="i-compare" viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="2"/><line x1="12" y1="3" x2="12" y2="21"/></symbol>
+      <symbol id="i-cases" viewBox="0 0 24 24"><rect x="2" y="7" width="20" height="14" rx="2"/><path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"/></symbol>
+      <symbol id="i-literacy" viewBox="0 0 24 24"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/></symbol>
+      <symbol id="i-check" viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></symbol>
+      <symbol id="i-shield" viewBox="0 0 24 24"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></symbol>
+      <symbol id="i-arrow-right" viewBox="0 0 24 24"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></symbol>
+      <symbol id="i-info" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/></symbol>
+      <symbol id="i-filter" viewBox="0 0 24 24"><polygon points="22 3 2 3 10 12.46 10 19 14 21 14 12.46 22 3"/></symbol>
+    </defs>
+  </svg>
+
+<!-- Main Application Shell -->
+  <div id="app-shell" style="display: flex; flex-direction: column; min-height: 100vh;">
+    <!-- Navigation Header -->
+    <header>
+      <div class="brand">
+        <span class="brand-mark"><svg class="icon"><use href="#i-compass"/></svg></span>
+        <span>NYU AI Discovery Hub</span>
+      </div>
+      <nav class="nav-links">
+        <button class="nav-tab active" data-view="view-compass"><svg class="icon icon-sm"><use href="#i-compass"/></svg> Discovery Hub</button>
+        <button class="nav-tab" data-view="view-explore"><svg class="icon icon-sm"><use href="#i-search"/></svg> Explore AI Tools</button>
+        <button class="nav-tab" data-view="view-compare"><svg class="icon icon-sm"><use href="#i-compare"/></svg> Compare Tools</button>
+        <button class="nav-tab" data-view="view-usecases"><svg class="icon icon-sm"><use href="#i-cases"/></svg> Use Cases</button>
+        <button class="nav-tab" data-view="view-literacy"><svg class="icon icon-sm"><use href="#i-literacy"/></svg> AI Literacy</button>
+      </nav>
+    </header>
+
+    <main>
+      <!-- 1. NYU AI DISCOVERY HUB (PRIMARY DECISION ENGINE) -->
+      <div id="view-compass" class="view-panel active">
+        <!-- Landing Hero Banner -->
+        <div id="compass-hero" class="card" style="background: linear-gradient(135deg, #ffffff 0%, #faf5ff 100%); border-color: var(--nyu-violet-muted); padding: 36px 28px;">
+          <span class="badge badge-nyu" style="align-self: flex-start;">DECISION SUPPORT ENGINE</span>
+          <div style="font-size: 1.8rem; font-weight: 850; color: var(--nyu-violet-dark); letter-spacing: -0.03em; margin-top: 4px;">
+            Find the right AI tool for what you're trying to accomplish.
+          </div>
+          <p style="color: var(--text-muted); font-size: 1rem; max-width: 680px; margin: 6px 0 16px 0;">
+            Answer a few quick questions about your pedagogical, research, or operational goals. The NYU AI Discovery Hub will evaluate institutional constraints and recommend vetted tools and workflows.
+          </p>
+          <div style="display: flex; gap: 12px; flex-wrap: wrap;">
+            <button class="btn-primary" onclick="startCompassFlow()"><svg class="icon icon-sm"><use href="#i-compass"/></svg> Start Discovery Hub</button>
+            <button class="btn-secondary" onclick="switchNav('view-explore')"><svg class="icon icon-sm"><use href="#i-search"/></svg> Explore All Tools</button>
+          </div>
+
+          <!-- Quick Scenario Starters -->
+          <div style="border-top: 1px solid var(--card-border); margin-top: 24px; padding-top: 20px;">
+            <div style="font-size: 0.84rem; font-weight: 750; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 10px;">
+              Or select a common university goal to start:
+            </div>
+            <div style="display: flex; gap: 8px; flex-wrap: wrap;">
+              <button class="btn-secondary" onclick="quickStartScenario('analyze-papers')">"I want to analyze research papers"</button>
+              <button class="btn-secondary" onclick="quickStartScenario('create-rubric')">"I need to build a course rubric"</button>
+              <button class="btn-secondary" onclick="quickStartScenario('ai-tutor')">"I want to create an AI tutor"</button>
+              <button class="btn-secondary" onclick="quickStartScenario('confidential-data')">"Which AI can safely handle institutional data?"</button>
+              <button class="btn-secondary" onclick="quickStartScenario('build-app')">"I want to build an application using an API"</button>
+            </div>
+          </div>
+        </div>
+
+        <!-- Guided Questionnaire Flow Container -->
+        <div id="compass-questionnaire" class="card" style="display: none;">
+          <!-- Progress Step Header -->
+          <div style="display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid var(--card-border); padding-bottom: 16px;">
+            <div>
+              <span class="badge badge-nyu" id="step-indicator-badge">STEP 1 OF 3</span>
+              <div class="card-title" id="step-question-title" style="margin-top: 4px;">What category best describes your goal?</div>
+            </div>
+            <button class="btn-secondary" onclick="resetCompassFlow()" style="font-size: 0.8rem; min-height: 32px; padding: 4px 10px;">Reset</button>
+          </div>
+
+          <!-- Question Content Injection Area -->
+          <div id="step-content-area" style="display: flex; flex-direction: column; gap: 16px;"></div>
+
+          <!-- Navigation Action Bar -->
+          <div style="display: flex; justify-content: space-between; align-items: center; border-top: 1px solid var(--card-border); padding-top: 16px;">
+            <button class="btn-secondary" id="btn-compass-back" onclick="previousCompassStep()" style="visibility: hidden;">Back</button>
+            <button class="btn-primary" id="btn-compass-next" onclick="nextCompassStep()">Continue <svg class="icon icon-sm"><use href="#i-arrow-right"/></svg></button>
+          </div>
+        </div>
+
+        <!-- Recommendation Results Container -->
+        <div id="compass-results" class="view-panel" style="display: none;">
+          <!-- Primary Recommendation Card -->
+          <div class="card" style="background: #ffffff; border: 2px solid var(--nyu-violet); box-shadow: var(--shadow-lg);">
+            <div style="display: flex; justify-content: space-between; align-items: flex-start; flex-wrap: wrap; gap: 12px;">
+              <div>
+                <span class="badge badge-nyu">PRIMARY RECOMMENDATION</span>
+                <div style="font-size: 1.6rem; font-weight: 850; color: var(--nyu-violet-dark); margin-top: 4px;" id="rec-primary-name">NotebookLM</div>
+                <div style="font-size: 0.95rem; color: var(--text-muted);" id="rec-primary-desc">Source-grounded document analysis and research synthesis.</div>
+              </div>
+              <div id="rec-primary-status"></div>
+            </div>
+
+            <!-- Why This Tool? Narrative Box -->
+            <div style="background: var(--nyu-violet-light); border: 1px solid var(--nyu-violet-muted); border-radius: 8px; padding: 18px;">
+              <div style="font-weight: 800; color: var(--nyu-violet-dark); font-size: 0.95rem; display: flex; align-items: center; gap: 6px;">
+                <svg class="icon icon-sm"><use href="#i-info"/></svg> Why this tool matches your needs:
+              </div>
+              <div id="rec-primary-why" style="font-size: 0.9rem; color: var(--text-main); margin-top: 6px; line-height: 1.55;"></div>
+            </div>
+
+            <!-- Strengths, Limitations, and Institutional Considerations Grid -->
+            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 16px;">
+              <div style="background: #f8fafc; border: 1px solid var(--card-border); padding: 14px; border-radius: 8px;">
+                <div style="font-weight: 750; font-size: 0.85rem; color: var(--accent-green); text-transform: uppercase; margin-bottom: 6px;">Key Strengths</div>
+                <ul id="rec-primary-strengths" style="margin: 0; padding-left: 18px; font-size: 0.85rem; color: var(--text-main); line-height: 1.45;"></ul>
+              </div>
+              <div style="background: #f8fafc; border: 1px solid var(--card-border); padding: 14px; border-radius: 8px;">
+                <div style="font-weight: 750; font-size: 0.85rem; color: var(--accent-amber); text-transform: uppercase; margin-bottom: 6px;">Important Limitations</div>
+                <ul id="rec-primary-limitations" style="margin: 0; padding-left: 18px; font-size: 0.85rem; color: var(--text-main); line-height: 1.45;"></ul>
+              </div>
+              <div style="background: #f8fafc; border: 1px solid var(--card-border); padding: 14px; border-radius: 8px;">
+                <div style="font-weight: 750; font-size: 0.85rem; color: var(--nyu-violet); text-transform: uppercase; margin-bottom: 6px;">Data & Institutional Notes</div>
+                <div id="rec-primary-privacy" style="font-size: 0.84rem; color: var(--text-muted); line-height: 1.45;"></div>
+              </div>
+            </div>
+
+            <!-- Suggested Workflow Action -->
+            <div style="border-top: 1px solid var(--card-border); padding-top: 16px;">
+              <div style="font-weight: 750; font-size: 0.9rem; color: var(--text-main); margin-bottom: 4px;">Suggested Next Workflow:</div>
+              <div id="rec-primary-workflow" style="font-size: 0.88rem; color: var(--text-muted); line-height: 1.5;"></div>
+            </div>
+
+            <div style="display: flex; gap: 10px; margin-top: 8px;">
+              <button class="btn-primary" onclick="restartCompassFlow()"><svg class="icon icon-sm"><use href="#i-compass"/></svg> Try Another Goal</button>
+            </div>
+          </div>
+
+          <!-- Alternatives / "Consider X If" Section -->
+          <div class="card">
+            <div class="card-title">Alternative Options to Consider</div>
+            <div id="rec-alternatives-container" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 14px;"></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- 2. EXPLORE AI TOOLS CATALOG -->
+      <div id="view-explore" class="view-panel">
+        <div class="card">
+          <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 12px;">
+            <div>
+              <div class="card-title"><svg class="icon"><use href="#i-search"/></svg> Explore AI Tools Catalog</div>
+              <p style="font-size: 0.88rem; color: var(--text-muted); margin: 2px 0 0 0;">Searchable institutional registry of enterprise, research, and developer AI platforms.</p>
+            </div>
+            <div style="display: flex; gap: 8px; width: 100%; max-width: 380px;">
+              <input type="text" id="catalog-search-input" placeholder="Search by name, capability, or use case..." oninput="filterToolsCatalog()" />
+            </div>
+          </div>
+
+          <!-- Category Filter Pills -->
+          <div style="display: flex; gap: 6px; flex-wrap: wrap; border-top: 1px solid var(--card-border); padding-top: 14px;" id="catalog-filter-buttons">
+            <button class="btn-secondary active" onclick="setCatalogFilter('all', this)" style="padding: 4px 10px; font-size: 0.8rem; min-height: 32px;">All Tools</button>
+            <button class="btn-secondary" onclick="setCatalogFilter('Teaching', this)" style="padding: 4px 10px; font-size: 0.8rem; min-height: 32px;">Teaching & Learning</button>
+            <button class="btn-secondary" onclick="setCatalogFilter('Research', this)" style="padding: 4px 10px; font-size: 0.8rem; min-height: 32px;">Research & Synthesis</button>
+            <button class="btn-secondary" onclick="setCatalogFilter('Coding', this)" style="padding: 4px 10px; font-size: 0.8rem; min-height: 32px;">Coding & Development</button>
+            <button class="btn-secondary" onclick="setCatalogFilter('API', this)" style="padding: 4px 10px; font-size: 0.8rem; min-height: 32px;">APIs & Enterprise</button>
+          </div>
+
+          <!-- Tools Card Grid -->
+          <div id="catalog-cards-grid" style="display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 16px; margin-top: 8px;"></div>
+        </div>
+      </div>
+
+      <!-- 3. COMPARE TOOLS MATRIX -->
+      <div id="view-compare" class="view-panel">
+        <div class="card">
+          <div class="card-title"><svg class="icon"><use href="#i-compare"/></svg> Interactive Tool Comparison Matrix</div>
+          <p style="font-size: 0.88rem; color: var(--text-muted); margin: 0;">Select 2 to 5 tools below to generate a side-by-side capability and institutional compliance matrix.</p>
+
+          <!-- Tool Checkbox Selection Bar -->
+          <div style="display: flex; gap: 8px; flex-wrap: wrap; background: #f8fafc; padding: 14px; border: 1px solid var(--card-border); border-radius: 8px;" id="compare-checkbox-container"></div>
+
+          <!-- Comparison Matrix Output Table -->
+          <div class="table-container" style="margin-top: 10px;">
+            <table class="matrix" id="comparison-matrix-table">
+              <!-- Dynamically Populated Matrix -->
+            </table>
+          </div>
+        </div>
+      </div>
+
+      <!-- 4. USE CASES SCENARIOS -->
+      <div id="view-usecases" class="view-panel">
+        <div class="card">
+          <div class="card-title"><svg class="icon"><use href="#i-cases"/></svg> Higher Education Use Cases</div>
+          <p style="font-size: 0.88rem; color: var(--text-muted); margin: 0;">Explore curated university scenarios designed for course design, literature reviews, and administrative productivity.</p>
+
+          <div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(310px, 1fr)); gap: 16px; margin-top: 8px;" id="usecases-grid-container"></div>
+        </div>
+      </div>
+
+      <!-- 5. AI LITERACY -->
+      <div id="view-literacy" class="view-panel">
+        <div class="card">
+          <div class="card-title"><svg class="icon"><use href="#i-literacy"/></svg> Faculty AI Literacy Primer</div>
+          <p style="font-size: 0.88rem; color: var(--text-muted); margin: 0;">Essential foundational AI concepts explained clearly for university faculty, researchers, and instructional staff.</p>
+
+          <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 16px; margin-top: 8px;" id="literacy-grid-container"></div>
+        </div>
+      </div>
+    </main>
+  </div>
+
+  <script>
+
+    // Structured Tools Registry Dataset
+    const AI_TOOLS_DATASET = [
+      {
+        id: "notebooklm",
+        name: "NotebookLM",
+        company: "Google",
+        categories: ["Research", "Teaching", "Document Analysis", "Writing"],
+        bestFor: ["Working with uploaded source documents", "Literature synthesis", "Building study guides & FAQs"],
+        capabilities: {
+          generalAI: "Supported",
+          documentUpload: "Excellent",
+          citations: "Excellent",
+          webSearch: "Limited",
+          imageGen: "None",
+          coding: "Limited",
+          api: "None",
+          collaboration: "Supported",
+          enterpriseSecurity: "Limited",
+          contextWindow: "Excellent (50+ source docs)"
+        },
+        suitability: { faculty: "Excellent", researchers: "Excellent", students: "Excellent" },
+        nyuStatus: "Placeholder — requires NYU review",
+        dataClassification: "Suitable for public/de-identified research",
+        cost: "Free",
+        description: "A personalized AI notebook grounded exclusively in documents, PDFs, and notes uploaded by the user with inline verifiable citations.",
+        strengths: ["Strict grounding to uploaded source documents", "Inline source citation numbers", "Zero hallucination beyond supplied files"],
+        limitations: ["Cannot generate images or run code", "Limited real-time web search outside user sources", "Not suited for application backend development"],
+        privacyNotes: "Files uploaded remain within user notebook scope. Avoid uploading confidential student records (FERPA) without enterprise authorization.",
+        workflow: "Upload your research PDFs or syllabus materials -> Ask synthesis questions -> Export formatted study notes.",
+        documentationUrl: "https://notebooklm.google.com"
+      },
+      {
+        id: "chatgpt",
+        name: "ChatGPT (GPT-4o)",
+        company: "OpenAI",
+        categories: ["Teaching", "Writing", "Data & Analysis", "Coding", "Productivity"],
+        bestFor: ["General brainstorming & drafting", "Data analysis & chart generation", "Interactive tutoring conversations"],
+        capabilities: {
+          generalAI: "Excellent",
+          documentUpload: "Supported",
+          citations: "Supported",
+          webSearch: "Supported",
+          imageGen: "Excellent (DALL-E)",
+          coding: "Excellent",
+          api: "None (Separate OpenAI API)",
+          collaboration: "Supported",
+          enterpriseSecurity: "Supported (Team/Enterprise)",
+          contextWindow: "Excellent (128k tokens)"
+        },
+        suitability: { faculty: "Excellent", researchers: "Supported", students: "Excellent" },
+        nyuStatus: "Placeholder — requires NYU review",
+        dataClassification: "Non-sensitive / General educational use",
+        cost: "Free / Plus ($20/mo) / Enterprise",
+        description: "A versatile multimodal assistant capable of text generation, live Python data analysis, image creation, and reasoning.",
+        strengths: ["Versatile multimodal reasoning", "Built-in Advanced Data Analysis Python runtime", "Strong interactive conversational flow"],
+        limitations: ["May cite non-existent sources if web browsing is disabled", "Free tier has usage caps on top models"],
+        privacyNotes: "Opt-out of model training in Settings when using personal accounts. Do not input restricted student/HR data.",
+        workflow: "Input assignment objectives -> Draft rubric criteria -> Refine tone and formatting.",
+        documentationUrl: "https://chatgpt.com"
+      },
+      {
+        id: "copilot",
+        name: "Microsoft Copilot",
+        company: "Microsoft",
+        categories: ["Productivity", "Writing", "Administration", "Teaching"],
+        bestFor: ["Microsoft 365 integration (Word, PPT, Teams)", "Enterprise search", "Workplace productivity"],
+        capabilities: {
+          generalAI: "Excellent",
+          documentUpload: "Supported",
+          citations: "Supported",
+          webSearch: "Excellent (Bing)",
+          imageGen: "Supported (Designer)",
+          coding: "Supported",
+          api: "None",
+          collaboration: "Excellent",
+          enterpriseSecurity: "Excellent",
+          contextWindow: "Supported"
+        },
+        suitability: { faculty: "Excellent", researchers: "Supported", students: "Supported" },
+        nyuStatus: "Placeholder — requires NYU review",
+        dataClassification: "Enterprise Protected (Commercial Data Protection)",
+        cost: "Free (Web) / M365 Add-on",
+        description: "An enterprise-ready AI assistant integrated across Microsoft 365 applications with commercial data protection.",
+        strengths: ["Commercial Data Protection (prompts not saved or trained on)", "Native Word, PowerPoint, and Excel workflows", "Real-time web search citations"],
+        limitations: ["Long complex document synthesis is less focused than NotebookLM", "Occasional conversational repetition"],
+        privacyNotes: "Sign in with institutional Microsoft credentials to ensure commercial data protection is active.",
+        workflow: "Draft course announcements in Word -> Summarize meeting transcripts in Teams.",
+        documentationUrl: "https://copilot.microsoft.com"
+      },
+      {
+        id: "claude",
+        name: "Claude (3.5 Sonnet / Opus)",
+        company: "Anthropic",
+        categories: ["Writing", "Coding", "Research", "Teaching"],
+        bestFor: ["Nuanced academic writing", "Complex coding & debugging", "Artifact UI previewing"],
+        capabilities: {
+          generalAI: "Excellent",
+          documentUpload: "Excellent",
+          citations: "Supported",
+          webSearch: "Limited",
+          imageGen: "None",
+          coding: "Excellent",
+          api: "None (Separate API)",
+          collaboration: "Supported (Projects)",
+          enterpriseSecurity: "Supported (Team)",
+          contextWindow: "Excellent (200k tokens)"
+        },
+        suitability: { faculty: "Excellent", researchers: "Excellent", students: "Supported" },
+        nyuStatus: "Placeholder — requires NYU review",
+        dataClassification: "Academic & General Analysis",
+        cost: "Free / Pro ($20/mo) / Team",
+        description: "An advanced reasoning and writing assistant known for natural academic tone, large 200k context window, and live Artifacts.",
+        strengths: ["Superior academic prose quality and tone", "Large 200,000 token context window", "Interactive Artifacts for code and documents"],
+        limitations: ["No native image generation", "No real-time web search in standard interface"],
+        privacyNotes: "Anthropic does not train on commercial API data by default; verify web account privacy settings.",
+        workflow: "Paste long manuscript drafts -> Request structural critique and line-by-line feedback.",
+        documentationUrl: "https://claude.ai"
+      },
+      {
+        id: "perplexity",
+        name: "Perplexity AI",
+        company: "Perplexity",
+        categories: ["Research", "Writing", "Productivity"],
+        bestFor: ["Academic literature discovery", "Fact-checked research queries", "Source-linked overviews"],
+        capabilities: {
+          generalAI: "Supported",
+          documentUpload: "Supported",
+          citations: "Excellent",
+          webSearch: "Excellent (Academic Focus)",
+          imageGen: "None",
+          coding: "Supported",
+          api: "Supported",
+          collaboration: "Supported (Collections)",
+          enterpriseSecurity: "Supported",
+          contextWindow: "Supported"
+        },
+        suitability: { faculty: "Excellent", researchers: "Excellent", students: "Excellent" },
+        nyuStatus: "Placeholder — requires NYU review",
+        dataClassification: "Public Research Discovery",
+        cost: "Free / Pro ($20/mo)",
+        description: "An AI search engine combining language models with web indexing to provide cited, verified academic overviews.",
+        strengths: ["Explicit footnote citations for every assertion", "Academic focus filter (PubMed, ArXiv, Semantic Scholar)", "Collections for shared research topics"],
+        limitations: ["Not intended for creative writing or freeform brainstorming", "No image or video generation"],
+        privacyNotes: "Queries are processed against public web indexes. Do not include private institutional identifiers in search prompts.",
+        workflow: "Toggle 'Academic' focus -> Enter domain query -> Review cited peer-reviewed papers.",
+        documentationUrl: "https://perplexity.ai"
+      },
+      {
+        id: "gemini",
+        name: "Google Gemini",
+        company: "Google",
+        categories: ["Productivity", "Writing", "Teaching", "Media Creation"],
+        bestFor: ["Google Workspace integration (Docs, Gmail)", "Multimodal video/audio reasoning", "Quick drafting"],
+        capabilities: {
+          generalAI: "Excellent",
+          documentUpload: "Supported",
+          citations: "Supported",
+          webSearch: "Excellent (Google)",
+          imageGen: "Supported (Imagen)",
+          coding: "Supported",
+          api: "None",
+          collaboration: "Supported",
+          enterpriseSecurity: "Supported (Workspace)",
+          contextWindow: "Excellent (1M+ tokens)"
+        },
+        suitability: { faculty: "Excellent", researchers: "Supported", students: "Excellent" },
+        nyuStatus: "Placeholder — requires NYU review",
+        dataClassification: "Google Workspace Institutional Scope",
+        cost: "Free / Advanced ($20/mo)",
+        description: "A fast multimodal assistant integrated with Google Workspace and Search with massive context window capabilities.",
+        strengths: ["Massive context windows (up to 1M+ tokens)", "Integration with Google Drive, Docs, and Gmail", "Real-time Google search grounding"],
+        limitations: ["Coding nuances can sometimes lag Claude 3.5 Sonnet"],
+        privacyNotes: "Use institutional Google accounts configured with institutional data privacy protections.",
+        workflow: "Connect to Google Drive -> Summarize seminar notes stored in Docs.",
+        documentationUrl: "https://gemini.google.com"
+      },
+      {
+        id: "gemini-api",
+        name: "Google AI Studio / Gemini API",
+        company: "Google",
+        categories: ["Coding", "AI Agents & Automation", "Data & Analysis"],
+        bestFor: ["Building custom educational apps & bots", "Multimodal developer prototyping", "Long-document API processing"],
+        capabilities: {
+          generalAI: "Excellent",
+          documentUpload: "Excellent",
+          citations: "Supported",
+          webSearch: "Supported (Grounding)",
+          imageGen: "Supported",
+          coding: "Excellent",
+          api: "Excellent",
+          collaboration: "Supported",
+          enterpriseSecurity: "Excellent",
+          contextWindow: "Excellent (2M tokens)"
+        },
+        suitability: { faculty: "Supported", researchers: "Excellent", students: "Supported" },
+        nyuStatus: "Placeholder — requires NYU review",
+        dataClassification: "Developer / API Scope",
+        cost: "Pay-as-you-go / Free tier",
+        description: "A developer environment and REST API providing direct programmable access to Gemini 2.5 Flash and Pro models.",
+        strengths: ["Direct programmable API integration", "Up to 2M token context window", "System prompt and JSON mode controls"],
+        limitations: ["Requires software engineering skills to build interfaces", "Not an end-user chat tool"],
+        privacyNotes: "Paid API endpoints do not use prompt data for model training.",
+        workflow: "Prototype prompts in AI Studio -> Copy API key into custom Python/Next.js app.",
+        documentationUrl: "https://aistudio.google.com"
+      },
+      {
+        id: "openai-api",
+        name: "OpenAI API",
+        company: "OpenAI",
+        categories: ["Coding", "AI Agents & Automation"],
+        bestFor: ["Production AI application backends", "Function calling & agent swarms", "Custom fine-tuning"],
+        capabilities: {
+          generalAI: "Excellent",
+          documentUpload: "Excellent",
+          citations: "Supported",
+          webSearch: "Supported",
+          imageGen: "Excellent",
+          coding: "Excellent",
+          api: "Excellent",
+          collaboration: "Supported",
+          enterpriseSecurity: "Excellent",
+          contextWindow: "Excellent (128k tokens)"
+        },
+        suitability: { faculty: "Supported", researchers: "Excellent", students: "Supported" },
+        nyuStatus: "Placeholder — requires NYU review",
+        dataClassification: "Developer / Production Scope",
+        cost: "Usage-based billing",
+        description: "The developer platform powering GPT-4o, embeddings, Whisper audio, and Vision for custom institutional software.",
+        strengths: ["Industry standard developer ecosystem", "Reliable structured JSON outputs and tools", "Robust function calling"],
+        limitations: ["Developer expertise required", "Requires credit billing setup"],
+        privacyNotes: "OpenAI API data is not trained on by default.",
+        workflow: "Design agent schema -> Deploy serverless backend with OpenAI SDK.",
+        documentationUrl: "https://platform.openai.com"
+      },
+      {
+        id: "github-copilot",
+        name: "GitHub Copilot",
+        company: "GitHub / Microsoft",
+        categories: ["Coding"],
+        bestFor: ["Real-time in-editor code completion", "Explaining complex codebases", "Writing unit tests"],
+        capabilities: {
+          generalAI: "Limited",
+          documentUpload: "Limited",
+          citations: "None",
+          webSearch: "Limited",
+          imageGen: "None",
+          coding: "Excellent",
+          api: "None",
+          collaboration: "Supported",
+          enterpriseSecurity: "Excellent",
+          contextWindow: "Supported"
+        },
+        suitability: { faculty: "Excellent", researchers: "Excellent", students: "Excellent" },
+        nyuStatus: "Placeholder — requires NYU review",
+        dataClassification: "Source Code Repositories",
+        cost: "Free for verified Students & Faculty / Paid",
+        description: "An AI pair programmer integrated directly inside VS Code and JetBrains IDEs to suggest code and tests in real time.",
+        strengths: ["Inline code completion inside IDEs", "Unit test and docstring generation", "Free for verified students and academic educators"],
+        limitations: ["Restricted to software development and coding tasks"],
+        privacyNotes: "Enterprise/Individual settings allow disabling public code matching and telemetry training.",
+        workflow: "Open VS Code -> Type code comments -> Accept suggested implementation with Tab.",
+        documentationUrl: "https://github.com/features/copilot"
+      },
+      {
+        id: "adobe-firefly",
+        name: "Adobe Firefly",
+        company: "Adobe",
+        categories: ["Media Creation"],
+        bestFor: ["Commercially safe image generation", "Generative fill & vector editing", "Instructional graphic design"],
+        capabilities: {
+          generalAI: "None",
+          documentUpload: "None",
+          citations: "None",
+          webSearch: "None",
+          imageGen: "Excellent",
+          coding: "None",
+          api: "Supported",
+          collaboration: "Supported",
+          enterpriseSecurity: "Excellent",
+          contextWindow: "None"
+        },
+        suitability: { faculty: "Excellent", researchers: "Supported", students: "Excellent" },
+        nyuStatus: "Placeholder — requires NYU review",
+        dataClassification: "Commercially Safe Media Generation",
+        cost: "Included in Adobe Creative Cloud / Free credits",
+        description: "A generative media engine trained exclusively on Adobe Stock and public domain content designed for copyright safety.",
+        strengths: ["Commercially safe with intellectual property indemnification", "Integration with Photoshop, Illustrator, and InDesign", "Precise style reference matching"],
+        limitations: ["No text or code reasoning capabilities"],
+        privacyNotes: "Trained on licensed Adobe Stock images to prevent copyright infringement.",
+        workflow: "Input prompt and style reference -> Generate licensed visual asset for course slides.",
+        documentationUrl: "https://firefly.adobe.com"
+      }
+    ];
+
+    // Navigation Switcher
+    function switchNav(viewId) {
+      document.querySelectorAll('.nav-tab').forEach(t => t.classList.remove('active'));
+      const activeTab = document.querySelector(`.nav-tab[data-view="${viewId}"]`);
+      if (activeTab) activeTab.classList.add('active');
+
+      document.querySelectorAll('.view-panel').forEach(p => p.classList.remove('active'));
+      const activePanel = document.getElementById(viewId);
+      if (activePanel) activePanel.classList.add('active');
+
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+
+    document.querySelectorAll('.nav-tab').forEach(tab => {
+      tab.onclick = () => switchNav(tab.getAttribute('data-view'));
+    });
+
+    // 1. NYU AI DISCOVERY HUB QUESTIONNAIRE LOGIC
+    let compassState = {
+      step: 1,
+      category: null,
+      activity: null,
+      constraints: {
+        sensitiveData: false,
+        sourceDocuments: false,
+        citationsNeeded: false,
+        webSearchNeeded: false,
+        codingNeeded: false,
+        imageGenNeeded: false,
+        apiNeeded: false,
+        collaborationNeeded: false,
+        studentFacing: false
+      }
+    };
+
+    const COMPASS_CATEGORIES = [
+      { id: "Teaching", title: "Teaching & Learning", desc: "Course design, assignments, rubrics, quizzes, and tutoring." },
+      { id: "Research", title: "Research & Synthesis", desc: "Literature reviews, document analysis, citations, and grants." },
+      { id: "Writing", title: "Writing & Communication", desc: "Manuscripts, policy drafts, emails, and editing." },
+      { id: "Data", title: "Data & Analysis", desc: "Spreadsheet analysis, statistical code, and chart generation." },
+      { id: "Coding", title: "Coding & Development", desc: "Writing scripts, debugging, unit tests, and software tools." },
+      { id: "Media", title: "Media Creation", desc: "Commercially safe images, diagrams, and video assets." },
+      { id: "Productivity", title: "Productivity & Admin", desc: "Meeting summaries, institutional workflow automation, Office 365." },
+      { id: "API", title: "AI Agents & Automation", desc: "Building custom bots, API integrations, and developer tools." }
+    ];
+
+    const COMPASS_ACTIVITIES = {
+      "Teaching": [
+        { id: "t_rubric", title: "Build a Grading Rubric", desc: "Create structured criteria with performance levels.", boost: ["chatgpt", "claude"] },
+        { id: "t_course", title: "Design a Course Syllabus", desc: "Structure 14-week schedules and weekly objectives.", boost: ["claude", "chatgpt"] },
+        { id: "t_tutor", title: "Create an AI Tutor / Study Bot", desc: "Interactive student-facing tutoring or Socratic chat.", boost: ["notebooklm", "gemini-api"] },
+        { id: "t_assignment", title: "Create or Redesign an Assignment", desc: "Design authentic assessments or discussion questions.", boost: ["claude", "chatgpt"] },
+        { id: "t_source", title: "Analyze Course Documents / PDFs", desc: "Extract key themes from readings with strict citations.", boost: ["notebooklm"] }
+      ],
+      "Research": [
+        { id: "r_papers", title: "Analyze a Collection of Papers", desc: "Synthesize 10-50 PDF papers with verifiable citations.", boost: ["notebooklm"] },
+        { id: "r_discovery", title: "Discover New Literature", desc: "Find recent peer-reviewed literature with real web links.", boost: ["perplexity"] },
+        { id: "r_grant", title: "Brainstorm Grant / Proposal Ideas", desc: "Structure aims, significance, and methodology drafts.", boost: ["claude", "chatgpt"] },
+        { id: "r_data", title: "Analyze Empirical Data & Stats", desc: "Run Python scripts on research datasets.", boost: ["chatgpt"] }
+      ],
+      "Writing": [
+        { id: "w_manuscript", title: "Academic Manuscript Polish", desc: "Line-by-line stylistic critiques and clarity enhancements.", boost: ["claude"] },
+        { id: "w_summary", title: "Summarize Long Reports", desc: "Condense long text without losing nuance.", boost: ["claude", "notebooklm"] },
+        { id: "w_email", title: "Draft Professional Communications", desc: "Institutional emails, policy briefs, and announcements.", boost: ["copilot", "chatgpt"] }
+      ],
+      "Data": [
+        { id: "d_csv", title: "Analyze CSV/Excel Spreadsheets", desc: "Generate summary statistics and interactive charts.", boost: ["chatgpt"] },
+        { id: "d_viz", title: "Data Visualization & Graphs", desc: "Create matplotlib/seaborn charts and graphs.", boost: ["chatgpt", "claude"] }
+      ],
+      "Coding": [
+        { id: "c_ide", title: "In-Editor Code Suggestions", desc: "Autocomplete code inside VS Code / JetBrains.", boost: ["github-copilot"] },
+        { id: "c_debug", title: "Debug Complex Algorithms", desc: "Explain error logs and optimize code architecture.", boost: ["claude", "chatgpt"] }
+      ],
+      "Media": [
+        { id: "m_img", title: "Generate Safe Course Images", desc: "Commercially safe imagery for slide decks and teaching.", boost: ["adobe-firefly"] },
+        { id: "m_creative", title: "Creative Concept Art", desc: "Expressive artistic visuals and concept exploration.", boost: ["chatgpt"] }
+      ],
+      "Productivity": [
+        { id: "p_m365", title: "Work inside Word, Teams, or Excel", desc: "Enterprise AI tools integrated into daily Office tasks.", boost: ["copilot"] },
+        { id: "p_google", title: "Work inside Google Drive & Docs", desc: "Summarize files directly stored in Google Workspace.", boost: ["gemini"] }
+      ],
+      "API": [
+        { id: "a_app", title: "Build a Custom AI Application", desc: "Integrate LLM endpoints into Python/Node software.", boost: ["gemini-api", "openai-api"] },
+        { id: "a_agents", title: "Develop Autonomous Agents", desc: "Function calling, tools, and multi-step workflows.", boost: ["openai-api", "gemini-api"] }
+      ]
+    };
+
+    function startCompassFlow() {
+      document.getElementById('compass-hero').style.display = 'none';
+      document.getElementById('compass-results').style.display = 'none';
+      document.getElementById('compass-questionnaire').style.display = 'flex';
+      compassState.step = 1;
+      renderCompassStep();
+    }
+
+    function resetCompassFlow() {
+      compassState = {
+        step: 1,
+        category: null,
+        activity: null,
+        constraints: {
+          sensitiveData: false,
+          sourceDocuments: false,
+          citationsNeeded: false,
+          webSearchNeeded: false,
+          codingNeeded: false,
+          imageGenNeeded: false,
+          apiNeeded: false,
+          collaborationNeeded: false,
+          studentFacing: false
+        }
+      };
+      document.getElementById('compass-hero').style.display = 'flex';
+      document.getElementById('compass-questionnaire').style.display = 'none';
+      document.getElementById('compass-results').style.display = 'none';
+    }
+
+    function restartCompassFlow() {
+      resetCompassFlow();
+      startCompassFlow();
+    }
+
+    function renderCompassStep() {
+      const content = document.getElementById('step-content-area');
+      const badge = document.getElementById('step-indicator-badge');
+      const title = document.getElementById('step-question-title');
+      const backBtn = document.getElementById('btn-compass-back');
+      const nextBtn = document.getElementById('btn-compass-next');
+
+      backBtn.style.visibility = compassState.step > 1 ? 'visible' : 'hidden';
+
+      if (compassState.step === 1) {
+        badge.innerText = "STEP 1 OF 3";
+        title.innerText = "What category best describes what you are trying to accomplish?";
+        nextBtn.innerText = "Select Specific Activity";
+        nextBtn.disabled = !compassState.category;
+
+        content.innerHTML = `
+          <div class="selection-grid">
+            ${COMPASS_CATEGORIES.map(c => `
+              <div class="select-card ${compassState.category === c.id ? 'selected' : ''}" onclick="selectCompassCategory('${c.id}')">
+                <div class="select-card-title">${c.title}</div>
+                <div class="select-card-desc">${c.desc}</div>
+              </div>
+            `).join('')}
+          </div>
+        `;
+      } else if (compassState.step === 2) {
+        badge.innerText = "STEP 2 OF 3";
+        title.innerText = `What specific ${compassState.category} activity do you want to perform?`;
+        nextBtn.innerText = "Configure Requirements & Constraints";
+        nextBtn.disabled = !compassState.activity;
+
+        const activities = COMPASS_ACTIVITIES[compassState.category] || COMPASS_ACTIVITIES["Teaching"];
+        content.innerHTML = `
+          <div class="selection-grid">
+            ${activities.map(a => `
+              <div class="select-card ${compassState.activity === a.id ? 'selected' : ''}" onclick="selectCompassActivity('${a.id}')">
+                <div class="select-card-title">${a.title}</div>
+                <div class="select-card-desc">${a.desc}</div>
+              </div>
+            `).join('')}
+          </div>
+        `;
+      } else if (compassState.step === 3) {
+        badge.innerText = "STEP 3 OF 3";
+        title.innerText = "Select your institutional requirements and constraints:";
+        nextBtn.innerText = "Generate Recommendation Report";
+        nextBtn.disabled = false;
+
+        content.innerHTML = `
+          <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 12px;">
+            <label style="display: flex; align-items: center; gap: 10px; background: #ffffff; border: 1px solid var(--card-border); padding: 12px; border-radius: 8px; cursor: pointer;">
+              <input type="checkbox" id="c-docs" ${compassState.constraints.sourceDocuments ? 'checked' : ''} onchange="toggleConstraint('sourceDocuments', this.checked)" style="width: auto;" />
+              <div>
+                <div style="font-weight: 700; font-size: 0.88rem;">Document Upload Required</div>
+                <div style="font-size: 0.78rem; color: var(--text-muted);">Working with specific PDFs, papers, or course readings.</div>
+              </div>
+            </label>
+            <label style="display: flex; align-items: center; gap: 10px; background: #ffffff; border: 1px solid var(--card-border); padding: 12px; border-radius: 8px; cursor: pointer;">
+              <input type="checkbox" id="c-citations" ${compassState.constraints.citationsNeeded ? 'checked' : ''} onchange="toggleConstraint('citationsNeeded', this.checked)" style="width: auto;" />
+              <div>
+                <div style="font-weight: 700; font-size: 0.88rem;">Verifiable Citations Required</div>
+                <div style="font-size: 0.78rem; color: var(--text-muted);">Need exact source footnotes to prevent hallucinations.</div>
+              </div>
+            </label>
+            <label style="display: flex; align-items: center; gap: 10px; background: #ffffff; border: 1px solid var(--card-border); padding: 12px; border-radius: 8px; cursor: pointer;">
+              <input type="checkbox" id="c-sensitive" ${compassState.constraints.sensitiveData ? 'checked' : ''} onchange="toggleConstraint('sensitiveData', this.checked)" style="width: auto;" />
+              <div>
+                <div style="font-weight: 700; font-size: 0.88rem;">Sensitive / Institutional Data</div>
+                <div style="font-size: 0.78rem; color: var(--text-muted);">Requires commercial data protection or FERPA privacy safeguards.</div>
+              </div>
+            </label>
+            <label style="display: flex; align-items: center; gap: 10px; background: #ffffff; border: 1px solid var(--card-border); padding: 12px; border-radius: 8px; cursor: pointer;">
+              <input type="checkbox" id="c-web" ${compassState.constraints.webSearchNeeded ? 'checked' : ''} onchange="toggleConstraint('webSearchNeeded', this.checked)" style="width: auto;" />
+              <div>
+                <div style="font-weight: 700; font-size: 0.88rem;">Live Web Search Needed</div>
+                <div style="font-size: 0.78rem; color: var(--text-muted);">Need up-to-date online search indexing.</div>
+              </div>
+            </label>
+            <label style="display: flex; align-items: center; gap: 10px; background: #ffffff; border: 1px solid var(--card-border); padding: 12px; border-radius: 8px; cursor: pointer;">
+              <input type="checkbox" id="c-api" ${compassState.constraints.apiNeeded ? 'checked' : ''} onchange="toggleConstraint('apiNeeded', this.checked)" style="width: auto;" />
+              <div>
+                <div style="font-weight: 700; font-size: 0.88rem;">API / Programmable Access Needed</div>
+                <div style="font-size: 0.78rem; color: var(--text-muted);">Building software or bots rather than using chat interfaces.</div>
+              </div>
+            </label>
+            <label style="display: flex; align-items: center; gap: 10px; background: #ffffff; border: 1px solid var(--card-border); padding: 12px; border-radius: 8px; cursor: pointer;">
+              <input type="checkbox" id="c-students" ${compassState.constraints.studentFacing ? 'checked' : ''} onchange="toggleConstraint('studentFacing', this.checked)" style="width: auto;" />
+              <div>
+                <div style="font-weight: 700; font-size: 0.88rem;">Student-Facing Activity</div>
+                <div style="font-size: 0.78rem; color: var(--text-muted);">Must be free/accessible for enrolled students without paid plans.</div>
+              </div>
+            </label>
+          </div>
+        `;
+      }
+    }
+
+    function selectCompassCategory(catId) {
+      compassState.category = catId;
+      compassState.activity = null;
+      renderCompassStep();
+    }
+
+    function selectCompassActivity(actId) {
+      compassState.activity = actId;
+      renderCompassStep();
+    }
+
+    function toggleConstraint(key, value) {
+      compassState.constraints[key] = value;
+    }
+
+    function nextCompassStep() {
+      if (compassState.step === 1 && compassState.category) {
+        compassState.step = 2;
+        renderCompassStep();
+      } else if (compassState.step === 2 && compassState.activity) {
+        compassState.step = 3;
+        renderCompassStep();
+      } else if (compassState.step === 3) {
+        calculateAndRenderRecommendation();
+      }
+    }
+
+    function previousCompassStep() {
+      if (compassState.step > 1) {
+        compassState.step--;
+        renderCompassStep();
+      }
+    }
+
+    function quickStartScenario(scenarioKey) {
+      startCompassFlow();
+      if (scenarioKey === 'analyze-papers') {
+        compassState.category = "Research";
+        compassState.activity = "r_papers";
+        compassState.constraints.sourceDocuments = true;
+        compassState.constraints.citationsNeeded = true;
+      } else if (scenarioKey === 'create-rubric') {
+        compassState.category = "Teaching";
+        compassState.activity = "t_rubric";
+      } else if (scenarioKey === 'ai-tutor') {
+        compassState.category = "Teaching";
+        compassState.activity = "t_tutor";
+        compassState.constraints.studentFacing = true;
+      } else if (scenarioKey === 'confidential-data') {
+        compassState.category = "Productivity";
+        compassState.activity = "p_m365";
+        compassState.constraints.sensitiveData = true;
+      } else if (scenarioKey === 'build-app') {
+        compassState.category = "API";
+        compassState.activity = "a_app";
+        compassState.constraints.apiNeeded = true;
+      }
+      compassState.step = 3;
+      renderCompassStep();
+    }
+
+    // RECOMMENDATION WEIGHTING ENGINE
+    function calculateAndRenderRecommendation() {
+      const scores = AI_TOOLS_DATASET.map(tool => {
+        let score = 50;
+        let reasons = [];
+        let warnings = [];
+
+        // Category match
+        if (tool.categories.includes(compassState.category)) {
+          score += 25;
+          reasons.push(`Built specifically for ${compassState.category} tasks.`);
+        }
+
+        // Activity boost
+        const activities = COMPASS_ACTIVITIES[compassState.category] || [];
+        const activeAct = activities.find(a => a.id === compassState.activity);
+        if (activeAct && activeAct.boost.includes(tool.id)) {
+          score += 30;
+          reasons.push(`Top-rated for "${activeAct.title}".`);
+        }
+
+        // Constraints weighting
+        if (compassState.constraints.sourceDocuments) {
+          if (tool.capabilities.documentUpload === "Excellent") {
+            score += 35;
+            reasons.push("Excels at document upload and grounding.");
+          } else if (tool.capabilities.documentUpload === "None") {
+            score -= 40;
+            warnings.push("Does not support document uploads.");
+          }
+        }
+
+        if (compassState.constraints.citationsNeeded) {
+          if (tool.capabilities.citations === "Excellent") {
+            score += 30;
+            reasons.push("Provides verified inline source citations.");
+          } else if (tool.capabilities.citations === "None") {
+            score -= 30;
+            warnings.push("Does not produce verifiable citations.");
+          }
+        }
+
+        if (compassState.constraints.sensitiveData) {
+          if (tool.capabilities.enterpriseSecurity === "Excellent") {
+            score += 40;
+            reasons.push("Offers commercial/enterprise data protection safeguards.");
+          } else {
+            score -= 25;
+            warnings.push("Ensure sensitive institutional records (FERPA/HIPAA) are de-identified before use.");
+          }
+        }
+
+        if (compassState.constraints.apiNeeded) {
+          if (tool.capabilities.api === "Excellent") {
+            score += 50;
+            reasons.push("Provides direct programmable API access.");
+          } else if (tool.capabilities.api === "None") {
+            score -= 60;
+            warnings.push("Consumer interface; does not offer programmable API endpoints.");
+          }
+        }
+
+        if (compassState.constraints.studentFacing) {
+          if (tool.cost.toLowerCase().includes("free")) {
+            score += 15;
+            reasons.push("Freely accessible for student participation.");
+          }
+        }
+
+        return { tool, score, reasons, warnings };
+      });
+
+      // Sort by score descending
+      scores.sort((a, b) => b.score - a.score);
+
+      const primary = scores[0];
+      const alternatives = scores.slice(1, 4);
+
+      // Render Primary
+      document.getElementById('rec-primary-name').innerText = primary.tool.name;
+      document.getElementById('rec-primary-desc').innerText = primary.tool.description;
+      document.getElementById('rec-primary-status').innerHTML = `
+        <span class="badge badge-nyu">${primary.tool.nyuStatus}</span>
+      `;
+      document.getElementById('rec-primary-why').innerHTML = `
+        You indicated a focus on <strong>${compassState.category}</strong>${compassState.activity ? ` (${primary.reasons[0] || ''})` : ''}.
+        ${primary.reasons.map(r => `<div>• ${r}</div>`).join('')}
+      `;
+      document.getElementById('rec-primary-strengths').innerHTML = primary.tool.strengths.map(s => `<li>${s}</li>`).join('');
+      document.getElementById('rec-primary-limitations').innerHTML = primary.tool.limitations.map(l => `<li>${l}</li>`).join('');
+      document.getElementById('rec-primary-privacy').innerHTML = `
+        <strong>Data Scope:</strong> ${primary.tool.dataClassification}<br/>
+        <span style="color:var(--text-muted); font-size:0.8rem;">${primary.tool.privacyNotes}</span>
+      `;
+      document.getElementById('rec-primary-workflow').innerText = primary.tool.workflow;
+
+      // Render Alternatives
+      const altContainer = document.getElementById('rec-alternatives-container');
+      altContainer.innerHTML = alternatives.map(alt => `
+        <div style="background: #ffffff; border: 1px solid var(--card-border); border-radius: 8px; padding: 16px; display: flex; flex-direction: column; gap: 8px;">
+          <div style="display: flex; justify-content: space-between; align-items: center;">
+            <div style="font-weight: 800; font-size: 1rem; color: var(--text-main);">${alt.tool.name}</div>
+            <span class="badge badge-neutral">${alt.tool.cost}</span>
+          </div>
+          <p style="font-size: 0.82rem; color: var(--text-muted); margin: 0;">${alt.tool.description}</p>
+          <div style="background: #f8fafc; padding: 8px 10px; border-radius: 6px; font-size: 0.8rem; border: 1px solid var(--card-border);">
+            <strong style="color: var(--nyu-violet);">Consider ${alt.tool.name} if:</strong> ${alt.tool.bestFor[0] || 'You need alternative capabilities.'}
+          </div>
+        </div>
+      `).join('');
+
+      document.getElementById('compass-questionnaire').style.display = 'none';
+      document.getElementById('compass-results').style.display = 'flex';
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+
+    // 2. EXPLORE TOOLS CATALOG LOGIC
+    let activeCatalogFilter = "all";
+
+    function renderToolsCatalog(tools = AI_TOOLS_DATASET) {
+      const container = document.getElementById('catalog-cards-grid');
+      container.innerHTML = tools.map(t => `
+        <div class="card" style="padding: 20px; background: #ffffff;">
+          <div style="display: flex; justify-content: space-between; align-items: flex-start;">
+            <div>
+              <div style="font-weight: 800; font-size: 1.1rem; color: var(--nyu-violet-dark);">${t.name}</div>
+              <div style="font-size: 0.8rem; color: var(--text-muted);">${t.company} • ${t.cost}</div>
+            </div>
+            <span class="badge badge-nyu" style="font-size:0.65rem;">${t.nyuStatus}</span>
+          </div>
+          <p style="font-size: 0.85rem; color: var(--text-main); margin: 0; line-height: 1.45;">${t.description}</p>
+          
+          <div style="display: flex; flex-wrap: wrap; gap: 4px;">
+            ${t.categories.map(c => `<span class="badge badge-neutral">${c}</span>`).join('')}
+          </div>
+
+          <div style="border-top: 1px solid var(--card-border); padding-top: 10px; font-size: 0.8rem; color: var(--text-muted);">
+            <strong style="color: var(--text-main);">Best For:</strong> ${t.bestFor.join(", ")}
+          </div>
+        </div>
+      `).join('');
+    }
+
+    function filterToolsCatalog() {
+      const query = document.getElementById('catalog-search-input').value.toLowerCase().trim();
+      let filtered = AI_TOOLS_DATASET;
+
+      if (activeCatalogFilter !== "all") {
+        filtered = filtered.filter(t => t.categories.includes(activeCatalogFilter));
+      }
+
+      if (query) {
+        filtered = filtered.filter(t => 
+          t.name.toLowerCase().includes(query) ||
+          t.description.toLowerCase().includes(query) ||
+          t.bestFor.some(b => b.toLowerCase().includes(query)) ||
+          t.categories.some(c => c.toLowerCase().includes(query))
+        );
+      }
+
+      renderToolsCatalog(filtered);
+    }
+
+    function setCatalogFilter(category, btn) {
+      activeCatalogFilter = category;
+      document.querySelectorAll('#catalog-filter-buttons button').forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+      filterToolsCatalog();
+    }
+
+    // 3. COMPARE TOOLS MATRIX LOGIC
+    let selectedCompareTools = ["notebooklm", "chatgpt", "claude"];
+
+    const MATRIX_CRITERIA = [
+      { id: "generalAI", label: "General Purpose Reasoning" },
+      { id: "documentUpload", label: "Document Upload & Synthesis" },
+      { id: "citations", label: "Verifiable Inline Citations" },
+      { id: "webSearch", label: "Live Web Search" },
+      { id: "imageGen", label: "Image Generation" },
+      { id: "coding", label: "Coding & Debugging" },
+      { id: "api", label: "Programmable API Access" },
+      { id: "collaboration", label: "Collaboration Features" },
+      { id: "enterpriseSecurity", label: "Enterprise Security Controls" },
+      { id: "contextWindow", label: "Context Window Scale" }
+    ];
+
+    function renderCompareCheckboxes() {
+      const container = document.getElementById('compare-checkbox-container');
+      container.innerHTML = AI_TOOLS_DATASET.map(t => `
+        <label style="display: inline-flex; align-items: center; gap: 6px; font-size: 0.85rem; font-weight: 600; cursor: pointer; background: #ffffff; padding: 6px 10px; border: 1px solid var(--card-border); border-radius: 6px;">
+          <input type="checkbox" value="${t.id}" ${selectedCompareTools.includes(t.id) ? 'checked' : ''} onchange="toggleCompareTool('${t.id}', this.checked)" style="width: auto;" />
+          ${t.name}
+        </label>
+      `).join('');
+    }
+
+    function toggleCompareTool(toolId, isChecked) {
+      if (isChecked) {
+        if (selectedCompareTools.length >= 5) {
+          alert("You can compare a maximum of 5 tools simultaneously.");
+          renderCompareCheckboxes();
+          return;
+        }
+        selectedCompareTools.push(toolId);
+      } else {
+        if (selectedCompareTools.length <= 2) {
+          alert("Please keep at least 2 tools selected for comparison.");
+          renderCompareCheckboxes();
+          return;
+        }
+        selectedCompareTools = selectedCompareTools.filter(id => id !== toolId);
+      }
+      renderComparisonMatrix();
+    }
+
+    function renderComparisonMatrix() {
+      const table = document.getElementById('comparison-matrix-table');
+      const tools = AI_TOOLS_DATASET.filter(t => selectedCompareTools.includes(t.id));
+
+      let html = `
+        <thead>
+          <tr>
+            <th style="width: 220px;">Evaluation Criteria</th>
+            ${tools.map(t => `<th><div style="font-weight:800; color:var(--nyu-violet);">${t.name}</div><div style="font-size:0.75rem; font-weight:500; color:var(--text-muted);">${t.company}</div></th>`).join('')}
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><strong>Cost / Access</strong></td>
+            ${tools.map(t => `<td>${t.cost}</td>`).join('')}
+          </tr>
+          <tr>
+            <td><strong>NYU Status</strong></td>
+            ${tools.map(t => `<td><span class="badge badge-nyu" style="font-size:0.65rem;">${t.nyuStatus}</span></td>`).join('')}
+          </tr>
+          ${MATRIX_CRITERIA.map(c => `
+            <tr>
+              <td><strong>${c.label}</strong></td>
+              ${tools.map(t => {
+                const val = t.capabilities[c.id] || "None";
+                let cls = "rating-none";
+                if (val.includes("Excellent")) cls = "rating-excellent";
+                else if (val.includes("Supported")) cls = "rating-supported";
+                else if (val.includes("Limited")) cls = "rating-limited";
+                return `<td><span class="rating-tag ${cls}">${val}</span></td>`;
+              }).join('')}
+            </tr>
+          `).join('')}
+          <tr>
+            <td><strong>Primary Strengths</strong></td>
+            ${tools.map(t => `<td style="font-size:0.8rem; color:var(--text-muted);">${t.strengths.join(", ")}</td>`).join('')}
+          </tr>
+        </tbody>
+      `;
+
+      table.innerHTML = html;
+    }
+
+    // 4. USE CASES SCENARIOS LOGIC
+    const UNIVERSITY_USE_CASES = [
+      { title: "Course Syllabus & Lesson Design", desc: "Structure learning objectives, weekly topic flows, and assessment plans.", tool: "Claude / ChatGPT", trigger: "create-rubric" },
+      { title: "Research Paper Corpus Synthesis", desc: "Analyze 20+ PDF papers with verifiable citations and zero hallucination.", tool: "NotebookLM", trigger: "analyze-papers" },
+      { title: "Interactive AI Student Tutoring", desc: "Build Socratic questioning and study bots for course concepts.", tool: "Tutor Bot / NotebookLM", trigger: "ai-tutor" },
+      { title: "Handling Sensitive Institutional Data", desc: "Ensure commercial data protection and FERPA compliance.", tool: "Microsoft Copilot", trigger: "confidential-data" },
+      { title: "Developing Custom AI Web Applications", desc: "Integrate LLM API backends into custom university tools.", tool: "Gemini API / OpenAI API", trigger: "build-app" },
+      { title: "Commercially Safe Instructional Media", desc: "Generate copyright-indemnified illustrations for course slides.", tool: "Adobe Firefly", trigger: "analyze-papers" }
+    ];
+
+    function renderUseCases() {
+      const container = document.getElementById('usecases-grid-container');
+      container.innerHTML = UNIVERSITY_USE_CASES.map(uc => `
+        <div class="card" style="padding: 20px; background: #ffffff; justify-content: space-between;">
+          <div>
+            <div style="font-weight: 800; font-size: 1.05rem; color: var(--text-main);">${uc.title}</div>
+            <p style="font-size: 0.85rem; color: var(--text-muted); margin: 6px 0 12px 0;">${uc.desc}</p>
+            <span class="badge badge-nyu">Recommended: ${uc.tool}</span>
+          </div>
+          <button class="btn-secondary" onclick="quickStartScenario('${uc.trigger}')" style="margin-top: 14px; width: 100%;">
+            Launch in Discovery Hub <svg class="icon icon-sm"><use href="#i-arrow-right"/></svg>
+          </button>
+        </div>
+      `).join('');
+    }
+
+    // 5. AI LITERACY CONCEPTS LOGIC
+    const LITERACY_CONCEPTS = [
+      { title: "What is Retrieval-Augmented Generation (RAG)?", desc: "A method that connects an AI model to specific documents (like course PDFs), forcing the model to cite and answer strictly from those sources rather than its general training memory." },
+      { title: "What is a Context Window?", desc: "The amount of text (measured in tokens) an AI can read and remember in a single interaction. A 200k token window can read entire books or dozens of research papers at once." },
+      { title: "What does 'Grounding' mean?", desc: "Anchoring the AI's output in verified external facts or user-supplied files, preventing it from inventing information outside the source material." },
+      { title: "What causes AI Hallucinations?", desc: "When a probabilistic language model generates plausible-sounding but factually false claims because it lacks direct source grounding or web verification." },
+      { title: "What is an AI Agent?", desc: "An autonomous AI system equipped with tools (search, terminal, code execution, APIs) that can break down complex multi-step goals and take action independently." },
+      { title: "What is Enterprise / Commercial Data Protection?", desc: "Agreements where AI vendors guarantee that user prompts and institutional data are never stored, logged, or used to train public models." },
+      { title: "What data should I avoid putting in AI tools?", desc: "Never enter confidential student records (FERPA), Protected Health Information (HIPAA), unreleased grant proposals, or institutional passwords into non-enterprise tools." }
+    ];
+
+    function renderLiteracy() {
+      const container = document.getElementById('literacy-grid-container');
+      container.innerHTML = LITERACY_CONCEPTS.map(lc => `
+        <div class="card" style="padding: 20px; background: #ffffff;">
+          <div style="font-weight: 800; font-size: 1rem; color: var(--nyu-violet-dark);">${lc.title}</div>
+          <p style="font-size: 0.88rem; color: var(--text-muted); margin: 6px 0 0 0; line-height: 1.5;">${lc.desc}</p>
+        </div>
+      `).join('');
+    }
+
+    // Application Initialization
+    window.onload = () => {
+
+      renderToolsCatalog();
+      renderCompareCheckboxes();
+      renderComparisonMatrix();
+      renderUseCases();
+      renderLiteracy();
+    };
+  </script>
+</body>
+</html>
